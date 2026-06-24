@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE.EX — Bloom. Build. Become.</title>
+  <meta name="description" content="THE.EX is a curated, faith-driven experience. GAL.EX for women. MAN.EX for men. June 26-27, 2026, Westchester County, NY.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --navy:#1D2F43; --navy-deep:#1a1a2e; --gold:#C9A84C; --blush:#D88C8C; --cream:#F5EDD6; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background: var(--navy-deep);
+      color: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .intro {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .glow {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 40% 30%, #D88C8C12 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 70%, #C9A84C10 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, #C9A84C08 0%, transparent 40%);
+      z-index: 0;
+    }
+
+    .top-line {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 2px; background: var(--gold);
+      animation: lineGrow 1s ease forwards 0.3s;
+    }
+
+    .welcome {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: #F5EDD666;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.5s;
+      margin-bottom: 24px;
+    }
+
+    .title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(64px, 15vw, 120px);
+      font-weight: 300;
+      letter-spacing: 0.06em;
+      line-height: 0.9;
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 0.8s;
+      margin-bottom: 16px;
+    }
+    .title .dot { color: var(--gold); }
+
+    .tagline {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #F5EDD655;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.2s;
+      margin-bottom: 40px;
+    }
+    .tagline .bloom { color: var(--blush); }
+    .tagline .become { color: var(--gold); }
+
+    .logo-wrap {
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.4s;
+      margin-bottom: 32px;
+    }
+    .logo-box {
+      background: linear-gradient(135deg, rgba(245,237,214,0.18), rgba(201,168,76,0.10));
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 16px;
+      padding: 20px 36px;
+      display: inline-block;
+      backdrop-filter: blur(8px);
+    }
+    .logo-box img {
+      max-width: 200px;
+      width: 100%;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .enter-btn {
+      display: inline-block;
+      padding: 16px 52px;
+      background: transparent;
+      border: 1px solid #C9A84C55;
+      border-radius: 4px;
+      color: var(--gold);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.8s;
+    }
+    .enter-btn:hover {
+      background: var(--gold);
+      color: var(--navy-deep);
+      border-color: var(--gold);
+      box-shadow: 0 4px 30px #C9A84C33;
+      transform: translateY(-2px);
+    }
+
+    .bottom-line {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 1px;
+      background: linear-gradient(90deg, var(--blush), var(--gold));
+      animation: lineGrow 1.2s ease forwards 1.8s;
+    }
+
+    .footer-text {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #F5EDD622;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 2.2s;
+      white-space: nowrap;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes lineGrow {
+      from { width: 0; }
+      to { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow"></div>
+  <div class="top-line"></div>
+
+  <div class="intro">
+    <div class="welcome">Welcome to</div>
+    <div class="title">THE<span class="dot">.</span>EX</div>
+    <div class="tagline">
+      <span class="bloom">Bloom</span> &middot; Build &middot; <span class="become">Become</span>
+    </div>
+    <div class="logo-wrap">
+      <div class="logo-box">
+        <img src="images/theex.png" alt="THE.EX Logo">
+      </div>
+    </div>
+    <a href="landing.html" class="enter-btn">Enter the Experience</a>
+  </div>
+
+  <div class="bottom-line"></div>
+  <div class="footer-text">A Movement Built on Purpose</div>
+
+</body>
+</html>
