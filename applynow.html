@@ -475,7 +475,6 @@
     const app = firebaseIsConfigured ? initializeApp(firebaseConfig) : null;
     const db = app ? getFirestore(app) : null;
     const mailCollectionName = 'mail';
-
     function updateConditional(groupName, targetId) {
       var selected = document.querySelector('input[name="' + groupName + '"]:checked');
       var target = document.getElementById(targetId);
@@ -565,6 +564,7 @@
             '<p><strong>Application reference:</strong> ' + applicationRef + '</p>' +
             '<p>THE.EX Community</p>'
         },
+        applicationId: applicationId,
         createdAt: serverTimestamp()
       };
     }
@@ -587,11 +587,11 @@
         smsConsent: getCheckedValue(formData, 'sms_consent'),
         event: formData.get('event'),
         attendingWithPerson: getCheckedValue(formData, 'attending_with_person'),
-        potentialAttendee: formData.get('potential_attendee').trim(),
+        potentialAttendee: (formData.get('potential_attendee') || '').trim(),
         churchAttendance: getCheckedValue(formData, 'church_attendance'),
-        church: formData.get('church').trim(),
+        church: (formData.get('church') || '').trim(),
         heardAboutEvent: formData.get('heard_about_event'),
-        comments: formData.get('comments').trim(),
+        comments: (formData.get('comments') || '').trim(),
         status: 'pending',
         source: 'applynow.html',
         createdAt: serverTimestamp()
