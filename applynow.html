@@ -274,6 +274,49 @@
       border-color: #D88C8C45;
     }
 
+    .toast {
+      align-items: center;
+      background: rgba(245, 237, 214, .96);
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.28);
+      color: var(--navy-deep);
+      display: flex;
+      font-size: 14px;
+      font-weight: 600;
+      gap: 10px;
+      line-height: 1.5;
+      max-width: calc(100% - 32px);
+      opacity: 0;
+      padding: 14px 18px;
+      pointer-events: none;
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      transform: translateY(-14px);
+      transition: opacity .25s ease, transform .25s ease;
+      width: min(360px, calc(100% - 32px));
+      z-index: 20;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-mark {
+      align-items: center;
+      background: var(--gold);
+      border-radius: 999px;
+      color: var(--navy-deep);
+      display: inline-flex;
+      flex: 0 0 auto;
+      font-size: 13px;
+      height: 24px;
+      justify-content: center;
+      width: 24px;
+    }
+
     .gold-btn:disabled {
       cursor: wait;
       opacity: .68;
@@ -300,6 +343,11 @@
   </style>
 </head>
 <body>
+  <div class="toast" id="toastMessage" role="status" aria-live="polite">
+    <span class="toast-mark" aria-hidden="true">✓</span>
+    <span id="toastText">Your application submitted successfully.</span>
+  </div>
+
   <div class="top-line"></div>
   <main class="page">
     <nav class="nav" aria-label="Application navigation">
@@ -426,7 +474,7 @@
     const firebaseIsConfigured = !firebaseConfig.apiKey.includes('YOUR_');
     const app = firebaseIsConfigured ? initializeApp(firebaseConfig) : null;
     const db = app ? getFirestore(app) : null;
-
+    const mailCollectionName = 'mail';
     function updateConditional(groupName, targetId) {
       var selected = document.querySelector('input[name="' + groupName + '"]:checked');
       var target = document.getElementById(targetId);
@@ -463,6 +511,64 @@
       messageEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
+    var toastTimer = null;
+
+    function showToast(message) {
+      var toast = document.getElementById('toastMessage');
+      var toastText = document.getElementById('toastText');
+      toastText.textContent = message;
+      toast.classList.add('show');
+
+      if (toastTimer) {
+        clearTimeout(toastTimer);
+      }
+
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('show');
+      }, 4500);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function buildConfirmationEmail(application, applicationId) {
+      var applicantName = escapeHtml(application.name);
+      var selectedEvent = escapeHtml(application.event);
+      var applicationRef = escapeHtml(applicationId);
+      var text = [
+        'Hi ' + application.name + ',',
+        '',
+        'Thank you for applying to attend ' + application.event + '. We received your THE.EX application and our team will review it shortly.',
+        '',
+        'You will be updated at this email address after your application has been reviewed.',
+        '',
+        'Application reference: ' + applicationId,
+        '',
+        'THE.EX Community'
+      ].join('\n');
+
+      return {
+        to: application.email,
+        message: {
+          subject: 'We received your THE.EX application',
+          text: text,
+          html: '<p>Hi ' + applicantName + ',</p>' +
+            '<p>Thank you for applying to attend <strong>' + selectedEvent + '</strong>. We received your THE.EX application and our team will review it shortly.</p>' +
+            '<p>You will be updated at this email address after your application has been reviewed.</p>' +
+            '<p><strong>Application reference:</strong> ' + applicationRef + '</p>' +
+            '<p>THE.EX Community</p>'
+        },
+        applicationId: applicationId,
+        createdAt: serverTimestamp()
+      };
+    }
+
     document.getElementById('applyForm').addEventListener('submit', async function(event) {
       event.preventDefault();
       var form = event.currentTarget;
@@ -481,12 +587,12 @@
         smsConsent: getCheckedValue(formData, 'sms_consent'),
         event: formData.get('event'),
         attendingWithPerson: getCheckedValue(formData, 'attending_with_person'),
-        potentialAttendee: formData.get('potential_attendee').trim(),
+        potentialAttendee: (formData.get('potential_attendee') || '').trim(),
         churchAttendance: getCheckedValue(formData, 'church_attendance'),
-        church: formData.get('church').trim(),
+        church: (formData.get('church') || '').trim(),
         heardAboutEvent: formData.get('heard_about_event'),
-        comments: formData.get('comments').trim(),
-        status: 'new',
+        comments: (formData.get('comments') || '').trim(),
+        status: 'pending',
         source: 'applynow.html',
         createdAt: serverTimestamp()
       };
@@ -495,11 +601,13 @@
       submitButton.textContent = 'Submitting...';
 
       try {
-        await addDoc(collection(db, 'applicant'), application);
+        var applicationDoc = await addDoc(collection(db, 'applicant'), application);
+        await addDoc(collection(db, mailCollectionName), buildConfirmationEmail(application, applicationDoc.id));
         form.reset();
         updateConditional('attending_with_person', 'guestNames');
         updateConditional('church_attendance', 'churchName');
-        showMessage('Thank you. Your THE.EX application has been submitted successfully.', false);
+        showToast('Your application submitted successfully.');
+        showMessage('Thank you. Your THE.EX application has been submitted successfully. A confirmation email will be sent to ' + application.email + ' shortly.', false);
       } catch (error) {
         console.error('Firebase submission failed:', error);
         showMessage('Something went wrong while submitting your application. Please try again in a moment.', true);
