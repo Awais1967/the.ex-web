@@ -370,16 +370,16 @@
           </div>
         </div>
 
-        <div class="field conditional" id="churchName">
-          <label for="church">If yes, what is the name of your church?</label>
-          <input id="church" name="church" type="text">
-        </div>
-
         <div class="field">
           <div class="field-title">Do you have a church that you attend frequently and regularly?</div>
           <div class="choice-group" role="radiogroup" aria-label="Church attendance">
             <label class="choice"><input type="radio" name="church_attendance" value="Yes" data-toggle="churchName" required> Yes</label>
             <label class="choice"><input type="radio" name="church_attendance" value="No" data-toggle="churchName"> No</label>
+          </div>
+
+          <div class="field conditional" id="churchName">
+            <label for="church">If yes, what is the name of your church?</label>
+            <input id="church" name="church" type="text">
           </div>
         </div>
 
@@ -495,7 +495,7 @@
       submitButton.textContent = 'Submitting...';
 
       try {
-        await addDoc(collection(db, 'applications'), application);
+        await addDoc(collection(db, 'applicant'), application);
         form.reset();
         updateConditional('attending_with_person', 'guestNames');
         updateConditional('church_attendance', 'churchName');
